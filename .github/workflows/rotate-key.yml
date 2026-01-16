@@ -14,10 +14,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
+    
       - name: Generate key and keep last 3
         run: |
-          KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9_-' | head -c 14)
+         KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9_-' | head -c 64)
 
           # cria arquivo se não existir
           touch keys.txt
