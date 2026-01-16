@@ -1,0 +1,30 @@
+name: Rotate Key
+
+on:
+  schedule:
+    - cron: "*/50 * * * *" # a cada 50 minutos
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate random key
+        run: |
+          KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9_-' | head -c 14)
+          echo "$KEY" > key.txt
+          echo "Generated key: $KEY"
+
+      - name: Commit and push
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add key.txt
+          git commit -m "Rotate key automatically" || echo "No changes"
+          git push
