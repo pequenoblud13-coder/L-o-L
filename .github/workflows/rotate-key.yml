@@ -2,7 +2,7 @@ name: Rotate Key
 
 on:
   schedule:
-    - cron: "*/50 * * * *" # a cada 50 minutos
+    - cron: "*/20 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,16 +15,32 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Generate random key
+      - name: Generate key and keep last 3
         run: |
           KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9_-' | head -c 14)
-          echo "$KEY" > key.txt
-          echo "Generated key: $KEY"
+
+          # cria arquivo se não existir
+          touch keys.txt
+
+          # adiciona key no topo
+          echo "$KEY" | cat - keys.txt > temp && mv temp keys.txt
+
+          # mantém só 3 linhas
+          head -n 3 keys.txt > temp && mv temp keys.txt
+
+          echo "NEW_KEY=$KEY" >> $GITHUB_ENV
+
+      - name: Send to Discord
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"content\":\"🔑 **Nova key gerada:** \`$NEW_KEY\`\"}" \
+            ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Commit and push
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add key.txt
-          git commit -m "Rotate key automatically" || echo "No changes"
+          git add keys.txt
+          git commit -m "Rotate key" || echo "No changes"
           git push
