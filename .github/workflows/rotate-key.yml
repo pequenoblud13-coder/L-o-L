@@ -30,12 +30,12 @@ jobs:
 
           echo "NEW_KEY=$KEY" >> $GITHUB_ENV
 
-      - name: Send to Discord
-        run: |
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"content\":\"🔑 **Nova key gerada:** \`$NEW_KEY\`\"}" \
-            ${{ secrets.DISCORD_WEBHOOK }}
+      #- name: Send to Discord
+       # run: |
+          #curl -X POST \
+           # -H "Content-Type: application/json" \
+           # -d "{\"content\":\"🔑 **Nova key gerada:** \`$NEW_KEY\`\"}" \
+           # ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Commit and push
         run: |
